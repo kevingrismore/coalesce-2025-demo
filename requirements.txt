@@ -1,0 +1,6 @@
+prefect
+prefect-dbt
+dbt-duckdb
+dbt-snowflake
+duckdb==1.3.2
+gitpython
