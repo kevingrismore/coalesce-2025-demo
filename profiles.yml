@@ -1,9 +1,5 @@
-jaffle_shop:
+github_fivetran:
   outputs:
-    duckdb:
-      type: duckdb
-      path: 'jaffle_shop.duckdb'
-      threads: 4
     snowflake:
       type: snowflake
       account: "{{ prefect.blocks.snowflake-credentials.coalesce-snowflake.account }}"
@@ -12,4 +8,4 @@ jaffle_shop:
       database: "{{ prefect.blocks.snowflake-connector.coalesce-snowflake-connector.database }}"
       schema: "{{ prefect.blocks.snowflake-connector.coalesce-snowflake-connector.schema }}"
       threads: 4
-  target: duckdb
+  target: snowflake
