@@ -9,7 +9,7 @@ from prefect_dbt import PrefectDbtRunner, PrefectDbtSettings
 
 DBT_PROJECT_DIR = "dbt_project"
 
-Repository = Literal["https://github.com/dbt-labs/jaffle_shop_duckdb.git", "https://github.com/fivetran/dbt_github.git"]
+Repository = Literal["https://github.com/dbt-labs/jaffle_shop_duckdb.git", "https://github.com/fivetran/dbt_github.git", "https://github.com/kevingrismore/coalesce-2025-github-fivetran.git"]
 
 @flow(
     description=(
