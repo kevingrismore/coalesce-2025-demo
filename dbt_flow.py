@@ -8,9 +8,8 @@ from prefect.runtime.flow_run import get_run_count
 from prefect_dbt import PrefectDbtRunner, PrefectDbtSettings
 
 DBT_PROJECT_DIR = "dbt_project"
-DBT_REPO_URL_TEMPLATE = "https://github.com/dbt-labs/{}.git"  # Replace this template with your own org's git url, leaving the {} as the placeholder for the dbt repo name
 
-Repository = Literal["jaffle_shop_duckdb"]
+Repository = Literal["https://github.com/dbt-labs/jaffle_shop_duckdb.git", "https://github.com/fivetran/dbt_github.git"]
 
 @flow(
     description=(
@@ -21,13 +20,11 @@ Repository = Literal["jaffle_shop_duckdb"]
     flow_run_name="dbt run: {repository}",
 )
 def dbt_flow(
-    repository: Repository = "jaffle_shop_duckdb", commands: list[str] | None = None
+    repo_url: Repository, commands: list[str] | None = None
 ):  # Replace the default dbt repo with your own
     try:
         if commands is None:
             commands = ["deps", "build"]
-
-        repo_url = DBT_REPO_URL_TEMPLATE.format(repository)
 
         get_run_logger().info(f"Cloning repo {repo_url} to {DBT_PROJECT_DIR}")
         Repo.clone_from(repo_url, DBT_PROJECT_DIR)
