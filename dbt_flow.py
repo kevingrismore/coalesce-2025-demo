@@ -17,7 +17,7 @@ Repository = Literal["https://github.com/dbt-labs/jaffle_shop_duckdb.git", "http
         "Runs `dbt retry` if the flow is retrying."
     ),
     retries=2,
-    flow_run_name="dbt run: {repository}",
+    flow_run_name="dbt run: {repo_url}",
 )
 def dbt_flow(
     repo_url: Repository, commands: list[str] | None = None
