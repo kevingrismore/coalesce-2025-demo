@@ -1,5 +1,8 @@
 github_fivetran:
   outputs:
+    duckdb:
+      type: duckdb
+      threads: 4
     snowflake:
       type: snowflake
       account: "{{ prefect.blocks.snowflake-credentials.coalesce-snowflake.account }}"
