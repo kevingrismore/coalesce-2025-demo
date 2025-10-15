@@ -66,7 +66,7 @@ def create_markdown_report(project_dir: str):
     
     create_markdown_artifact(
         markdown=markdown_report,
-        key="dbt_report",
+        key="dbt-report",
     )
 
 def generate_dbt_markdown_report(run_results: dict) -> str:
