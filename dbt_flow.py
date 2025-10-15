@@ -161,18 +161,24 @@ def generate_dbt_markdown_report(run_results: dict) -> str:
     success_count = status_counts.get('success', 0)
     success_rate = (success_count / total_nodes * 100) if total_nodes > 0 else 0
     
-    # Add summary metrics
+    # Add summary metrics table
     report_lines.extend([
-        f"- **Total Nodes Executed:** {total_nodes}",
-        f"- **Success Rate:** {success_rate:.1f}%",
-        f"- **Total Execution Time:** {total_execution_time:.2f} seconds",
-        f"- **Average Execution Time:** {avg_execution_time:.2f} seconds",
+        "### Key Metrics",
+        "",
+        "| Metric | Value |",
+        "|--------|-------|",
+        f"| Total Nodes Executed | {total_nodes} |",
+        f"| Success Rate | {success_rate:.1f}% |",
+        f"| Total Execution Time | {total_execution_time:.2f} seconds |",
+        f"| Average Execution Time | {avg_execution_time:.2f} seconds |",
         "",
         "### Status Breakdown",
-        ""
+        "",
+        "| Status | Count | Percentage |",
+        "|--------|-------|------------|"
     ])
     
-    # Add status breakdown
+    # Add status breakdown table
     for status, count in sorted(status_counts.items()):
         percentage = (count / total_nodes * 100) if total_nodes > 0 else 0
         status_emoji = {
@@ -184,14 +190,14 @@ def generate_dbt_markdown_report(run_results: dict) -> str:
             'fail': '❌'
         }.get(status, '❓')
         
-        report_lines.append(f"- {status_emoji} **{status.title()}:** {count} ({percentage:.1f}%)")
+        report_lines.append(f"| {status_emoji} {status.title()} | {count} | {percentage:.1f}% |")
     
-    report_lines.extend(["", "### Node Types", ""])
+    report_lines.extend(["", "### Node Types", "", "| Node Type | Count | Percentage |", "|-----------|-------|------------|"])
     
-    # Add node type breakdown
+    # Add node type breakdown table
     for node_type, count in sorted(node_types.items()):
         percentage = (count / total_nodes * 100) if total_nodes > 0 else 0
-        report_lines.append(f"- **{node_type.title()}:** {count} ({percentage:.1f}%)")
+        report_lines.append(f"| {node_type.title()} | {count} | {percentage:.1f}% |")
     
     # Performance analysis
     if execution_times:
@@ -199,9 +205,13 @@ def generate_dbt_markdown_report(run_results: dict) -> str:
             "",
             "## ⚡ Performance Analysis",
             "",
-            f"- **Fastest Node:** {min_execution_time:.2f} seconds",
-            f"- **Slowest Node:** {max_execution_time:.2f} seconds",
-            f"- **Performance Range:** {max_execution_time - min_execution_time:.2f} seconds",
+            "### Performance Metrics",
+            "",
+            "| Metric | Value |",
+            "|--------|-------|",
+            f"| Fastest Node | {min_execution_time:.2f} seconds |",
+            f"| Slowest Node | {max_execution_time:.2f} seconds |",
+            f"| Performance Range | {max_execution_time - min_execution_time:.2f} seconds |",
             ""
         ])
         
@@ -210,41 +220,39 @@ def generate_dbt_markdown_report(run_results: dict) -> str:
         if slow_nodes and slow_nodes[0].get('execution_time', 0) > 0:
             report_lines.extend([
                 "### 🐌 Slowest Nodes",
-                ""
+                "",
+                "| Rank | Node ID | Execution Time |",
+                "|------|---------|----------------|"
             ])
             for i, node in enumerate(slow_nodes, 1):
                 exec_time = node.get('execution_time', 0)
                 if exec_time > 0:
-                    report_lines.append(f"{i}. **{node.get('unique_id', 'Unknown')}** - {exec_time:.2f}s")
+                    report_lines.append(f"| {i} | {node.get('unique_id', 'Unknown')} | {exec_time:.2f}s |")
             report_lines.append("")
     
     # Error analysis
     if errors:
         report_lines.extend([
             "## ❌ Error Analysis",
-            ""
+            "",
+            "| Node ID | Error Message | Execution Time |",
+            "|---------|---------------|----------------|"
         ])
         for error in errors:
-            report_lines.extend([
-                f"### {error['unique_id']}",
-                f"- **Error:** {error['message']}",
-                f"- **Execution Time:** {error['execution_time']:.2f} seconds",
-                ""
-            ])
+            report_lines.append(f"| {error['unique_id']} | {error['message']} | {error['execution_time']:.2f}s |")
+        report_lines.append("")
     
     # Warning analysis
     if warnings:
         report_lines.extend([
             "## ⚠️ Warning Analysis",
-            ""
+            "",
+            "| Node ID | Warning Message | Execution Time |",
+            "|---------|-----------------|----------------|"
         ])
         for warning in warnings:
-            report_lines.extend([
-                f"### {warning['unique_id']}",
-                f"- **Warning:** {warning['message']}",
-                f"- **Execution Time:** {warning['execution_time']:.2f} seconds",
-                ""
-            ])
+            report_lines.append(f"| {warning['unique_id']} | {warning['message']} | {warning['execution_time']:.2f}s |")
+        report_lines.append("")
     
     # Detailed results section
     report_lines.extend([
@@ -274,7 +282,9 @@ def generate_dbt_markdown_report(run_results: dict) -> str:
             
             report_lines.extend([
                 f"### {status_emoji} {status.title()} ({len(status_groups[status])})",
-                ""
+                "",
+                "| Node ID | Node Type | Execution Time | Message |",
+                "|---------|-----------|----------------|---------|"
             ])
             
             for result in status_groups[status]:
@@ -283,12 +293,9 @@ def generate_dbt_markdown_report(run_results: dict) -> str:
                 message = result.get('message', 'No message')
                 node_type = result.get('node_type', 'unknown')
                 
-                report_lines.extend([
-                    f"**{unique_id}** ({node_type})",
-                    f"- Execution Time: {execution_time:.2f}s",
-                    f"- Message: {message}",
-                    ""
-                ])
+                report_lines.append(f"| {unique_id} | {node_type} | {execution_time:.2f}s | {message} |")
+            
+            report_lines.append("")
     
     # Add footer
     report_lines.extend([
