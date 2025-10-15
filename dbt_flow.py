@@ -35,6 +35,7 @@ def dbt_flow(
         runner = PrefectDbtRunner(
             settings=PrefectDbtSettings(project_dir=DBT_PROJECT_DIR),
             include_compiled_code=True,
+            raise_on_failure=False,
         )
 
         if get_run_count() == 1:
